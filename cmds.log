@@ -1,0 +1,9 @@
+ 1342  nano numbers.py 
+ 1343  cat numbers.py 
+ 1344  time python3 numbers.py
+ 1345  awk -F '\t' '{ print $9 }' ../amazon_reviews_us_Books_v1_02.tsv | head
+ 1346  awk -F '\t' ' NR > 1 { print $9 }' ../amazon_reviews_us_Books_v1_02.tsv | head
+ 1347  nano helpful-stats.sh
+ 1348  time bash helpful-stats.sh 
+ 1349  time python3 numbers.py
+ 1350  history | tail -n 10 > cmds.log
