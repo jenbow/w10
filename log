@@ -1,0 +1,76 @@
+# Answer: 
+# The python script was faster at about 12 seconds, while my awk script took about 17 seconds.
+# I think perhaps if I cut column 9 first and then used awk, it might have been faster.  
+
+benbow@f6linuxA5:~/ws10$ script ws10.txt
+Script started, file is ws10.txt
+benbow@f6linuxA5:~/ws10$ nano numbers.py
+benbow@f6linuxA5:~/ws10$ cat numbers.py
+from itertools import islice
+
+
+with open("../amazon_reviews_us_Books_v1_02.tsv") as f:
+    numbers = []
+    for line in islice(f, 1, None): #skip the header row
+        numbers.append(int(line.split("\t")[8]))
+    numbers.sort()
+
+count = len(numbers)
+max_num = max(numbers)
+min_num = min(numbers)
+sum_of_nums = sum(numbers)
+avg = sum_of_nums/float(count)
+
+print("min %s max %s avg %s" % (min_num, max_num, avg ))
+benbow@f6linuxA5:~/ws10$ time python3 numbers.py
+min 0 max 15835 avg 9.33467921636312
+
+real	0m12.059s
+user	0m10.488s
+sys	0m1.244s
+benbow@f6linuxA5:~/ws10$ awk -F '\t' '{ print $9 }' ../amazon_reviews_us_Books_v
+1_02.tsv | head
+helpful_votes
+2
+5
+1
+2
+0
+2
+9
+3
+16
+benbow@f6linuxA5:~/ws10$ awk -F '\t' ' NR > 1 { print $9 }' ../amazon_reviews_us_Books_v1_02.tsv | head
+2
+5
+1
+2
+0
+2
+9
+3
+16
+0
+benbow@f6linuxA5:~/ws10$ nano helpful-stats.sh
+benbow@f6linuxA5:~/ws10$ time bash helpful-stats.sh
+min 0 max 15835 avg 9.33468
+
+real	0m17.865s
+user	0m16.902s
+sys	0m0.934s
+benbow@f6linuxA5:~/ws10$ time python3 numbers.py
+min 0 max 15835 avg 9.33467921636312
+
+real	0m12.098s
+user	0m10.653s
+sys	0m1.100s
+
+benbow@f6linuxA5:~/ws10$ cat helpful-stats.sh
+
+
+awk -F $'\t' ' NR > 1 { if ( min == "") { min = max = $9 } ;\
+                        if ( $9 > max ) { max = $9 } ;\
+                        if ($9 < min ) { min = $9 } ;\
+sum += $9 } END { print "min " min " max " max " avg " sum / ( NR - 1 ) } ' ../amazon_reviews_us_Books_v1_02.tsv
+
+Script done, file is ws10.txt
